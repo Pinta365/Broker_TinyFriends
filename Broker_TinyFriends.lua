@@ -177,7 +177,7 @@ local function SortFriends(friends, friendList)
         elseif sortKey == "note" then 
             sortKey = "note"
         elseif sortKey == "client" then
-            sortKey = "wowProjectID"
+            sortKey = friendList == "wow" and "wowProjectID" or "clientName"
         elseif sortKey == "faction" then
             sortKey = "factionName"
         else
