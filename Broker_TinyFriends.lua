@@ -1,5 +1,6 @@
 local addonName, AddonTable = ...
 local friendsFrame
+local classLookup
 local tempFontString
 
 local nameMaxWidth
@@ -35,7 +36,7 @@ local clientList = {
     BSAp = "Mobile App"
 }
 
-local function UpdateFriendsList()
+local function updateFriendsList()
     local wowFriends = {}
     local otherFriends = {}
 
@@ -58,8 +59,6 @@ local function UpdateFriendsList()
 
             if gameInfo.isOnline then
                 if gameInfo.clientProgram == "WoW" then
-                    local _, classLocalizationIndependent = GetPlayerInfoByGUID(gameInfo.playerGuid)
-
                     local friend = {
                         name = name,
                         accountName = accountInfo.accountName,
@@ -72,7 +71,7 @@ local function UpdateFriendsList()
                         clientProgram = gameInfo.clientProgram,
                         characterName = gameInfo.characterName,
                         className = gameInfo.className,
-                        classLocalizationIndependent = classLocalizationIndependent,
+                        classLocalizationIndependent = classLookup[gameInfo.className],
                         characterLevel = gameInfo.characterLevel,
                         realmName = gameInfo.realmName,
                         richPresence = gameInfo.richPresence,
@@ -163,13 +162,13 @@ local function UpdateFriendsList()
     return #wowFriends, #otherFriends
 end
 
-local function AnchorFriendsFrame(ldbObject)
+local function anchorFriendsFrame(ldbObject)
     local isTop = select(2, ldbObject:GetCenter()) > UIParent:GetHeight() / 2
     friendsFrame:ClearAllPoints()
     friendsFrame:SetPoint(isTop and "TOP" or "BOTTOM", ldbObject, isTop and "BOTTOM" or "TOP", 0, 0)
 end
 
-local function SortFriends(friends, friendList)
+local function sortFriends(friends, friendList)
     local sortData = friendList == "wow" and AddonTable.wowFriendsSort or AddonTable.otherFriendsSort
     if sortData.order then
         local sortKey = sortData.order
@@ -196,14 +195,14 @@ local function SortFriends(friends, friendList)
         end)
     end
 end
-local function ShowFriendsList(ldbObject)
+local function showFriendsList(ldbObject)
     if friendsFrame then
         friendsFrame:Hide()
         friendsFrame:SetParent(nil)
         friendsFrame = nil
     end
 
-    local function SortByHeader(self, button, friendList)
+    local function sortByHeader(self, button, friendList)
         if friendList == "wow" then 
             if AddonTable.wowFriendsSort.order == self.sortType then
                 AddonTable.wowFriendsSort.ascending = not AddonTable.wowFriendsSort.ascending
@@ -211,7 +210,7 @@ local function ShowFriendsList(ldbObject)
                 AddonTable.wowFriendsSort.order = self.sortType
                 AddonTable.wowFriendsSort.ascending = true
             end
-            SortFriends(AddonTable.wowFriends, "wow")
+            sortFriends(AddonTable.wowFriends, "wow")
         else -- "other"
             if AddonTable.otherFriendsSort.order == self.sortType then
                 AddonTable.otherFriendsSort.ascending = not AddonTable.otherFriendsSort.ascending
@@ -219,13 +218,13 @@ local function ShowFriendsList(ldbObject)
                 AddonTable.otherFriendsSort.order = self.sortType
                 AddonTable.otherFriendsSort.ascending = true
             end
-            SortFriends(AddonTable.otherFriends, "other")
+            sortFriends(AddonTable.otherFriends, "other")
         end
         
-        ShowFriendsList(ldbObject)
+        showFriendsList(ldbObject)
     end
     
-    local function CreateHeader(parentFrame, horizontalPosition, text, sortType, friendList)
+    local function createHeader(parentFrame, horizontalPosition, text, sortType, friendList)
         local header = CreateFrame("Button", nil, parentFrame)
         local headerText = header:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
         header:SetPoint("TOPLEFT", horizontalPosition, -10)
@@ -235,7 +234,7 @@ local function ShowFriendsList(ldbObject)
         header:SetSize(headerText:GetStringWidth() + 10, 15)
         header.sortType = sortType
         header:SetScript("OnClick", function(self, button)
-            SortByHeader(self, button, friendList)
+            sortByHeader(self, button, friendList)
         end)
         return header
     end
@@ -273,12 +272,12 @@ local function ShowFriendsList(ldbObject)
     wowFriendsFrame:SetSize(panelWidthWow + headerPadding, wowFriendsHeight)
 
     -- Headers for WoW friends
-    CreateHeader(wowFriendsFrame, nameHorizontalPosition + headerPadding, "Name", "name", "wow")
-    CreateHeader(wowFriendsFrame, factionHorizontalPosition + headerPadding, "Faction", "faction", "wow")
-    CreateHeader(wowFriendsFrame, levelHorizontalPosition + headerPadding, "Level", "level", "wow")
-    CreateHeader(wowFriendsFrame, clientHorizontalPosition + headerPadding, "Client", "client", "wow")
-    CreateHeader(wowFriendsFrame, presenceHorizontalPosition + headerPadding, "Presence", "presence", "wow")
-    CreateHeader(wowFriendsFrame, noteHorizontalPosition + headerPadding, "Note", "note", "wow")
+    createHeader(wowFriendsFrame, nameHorizontalPosition + headerPadding, "Name", "name", "wow")
+    createHeader(wowFriendsFrame, factionHorizontalPosition + headerPadding, "Faction", "faction", "wow")
+    createHeader(wowFriendsFrame, levelHorizontalPosition + headerPadding, "Level", "level", "wow")
+    createHeader(wowFriendsFrame, clientHorizontalPosition + headerPadding, "Client", "client", "wow")
+    createHeader(wowFriendsFrame, presenceHorizontalPosition + headerPadding, "Presence", "presence", "wow")
+    createHeader(wowFriendsFrame, noteHorizontalPosition + headerPadding, "Note", "note", "wow")
 
     -- Other Friends Frame
     local otherFriendsFrame = CreateFrame("Frame", nil, friendsFrame)
@@ -286,9 +285,9 @@ local function ShowFriendsList(ldbObject)
     otherFriendsFrame:SetSize(panelWidthOther * 2 + headerPadding + 10, otherFriendsHeight)
 
     -- Headers for Other friends (adjust positions as needed)
-    CreateHeader(otherFriendsFrame, nameHorizontalPositionOther + headerPadding, "Name", "name", "other")
-    CreateHeader(otherFriendsFrame, clientHorizontalPositionOther + headerPadding, "Client", "client", "other")
-    CreateHeader(otherFriendsFrame, presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other") 
+    createHeader(otherFriendsFrame, nameHorizontalPositionOther + headerPadding, "Name", "name", "other")
+    createHeader(otherFriendsFrame, clientHorizontalPositionOther + headerPadding, "Client", "client", "other")
+    createHeader(otherFriendsFrame, presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other") 
 
     -- Add a delimiter between the friend sections
     local horizontalDelimiter = wowFriendsFrame:CreateTexture(nil, "ARTWORK")
@@ -305,9 +304,9 @@ local function ShowFriendsList(ldbObject)
     verticalDelimiter:SetSize(1, otherFriendsHeight)
 
     -- Duplicate headers on the right column
-    CreateHeader(otherFriendsFrame, panelWidthOther + 20 + nameHorizontalPositionOther + headerPadding, "Name", "name", "other")
-    CreateHeader(otherFriendsFrame, panelWidthOther + 20 + clientHorizontalPositionOther + headerPadding, "Client", "client", "other")
-    CreateHeader(otherFriendsFrame, panelWidthOther + 20 + presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other") 
+    createHeader(otherFriendsFrame, panelWidthOther + 20 + nameHorizontalPositionOther + headerPadding, "Name", "name", "other")
+    createHeader(otherFriendsFrame, panelWidthOther + 20 + clientHorizontalPositionOther + headerPadding, "Client", "client", "other")
+    createHeader(otherFriendsFrame, panelWidthOther + 20 + presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other") 
 
     -- 1. Online WoW Friends
     local wowVerticalOffset = 25
@@ -354,9 +353,18 @@ local function ShowFriendsList(ldbObject)
         noteText:SetPoint("LEFT", noteHorizontalPosition, 0)
         friendFrame.noteText = noteText
 
-        local classColor = C_ClassColor.GetClassColor(friend.classLocalizationIndependent)
-        if classColor then
-            nameText:SetTextColor(classColor.r, classColor.g, classColor.b)
+        if friend.classLocalizationIndependent then
+            local classColor = C_ClassColor.GetClassColor(friend.classLocalizationIndependent)
+            if classColor then
+                nameText:SetTextColor(classColor.r, classColor.g, classColor.b)
+            end
+        end
+
+        if i % 2 == 0 then
+            local bgTexture = friendFrame:CreateTexture(nil, "BACKGROUND")
+            bgTexture:SetTexture("Interface\\Buttons\\WHITE8X8")
+            bgTexture:SetVertexColor(0, 0, 0, 0.2)
+            bgTexture:SetAllPoints(friendFrame)
         end
 
         nameText:SetText(friend.name .. " (" .. friend.characterName .. ")")
@@ -387,7 +395,7 @@ local function ShowFriendsList(ldbObject)
             end
         end)
 
-        wowVerticalOffset = wowVerticalOffset + verticalIncrement 
+        wowVerticalOffset = wowVerticalOffset + verticalIncrement
     end
 
     -- 2. Online Other Friends
@@ -417,7 +425,6 @@ local function ShowFriendsList(ldbObject)
         local clientIcon = friendFrame:CreateTexture(nil, "ARTWORK")
         clientIcon:SetPoint("LEFT", nameMaxWidthOther, 0)
         clientIcon:SetSize(15, 15)
-
         C_Texture.SetTitleIconTexture(clientIcon, friend.clientProgram, Enum.TitleIconVersion.Small);
 
         -- Add tooltip to client icon
@@ -479,7 +486,7 @@ local function ShowFriendsList(ldbObject)
     friendsFrame:Show()
     friendsFrame:SetClampedToScreen(true)
 
-    AnchorFriendsFrame(ldbObject)
+    anchorFriendsFrame(ldbObject)
 
     friendsFrame:HookScript("OnEnter", function()
         GameTooltip:Show()
@@ -497,7 +504,7 @@ local function ShowFriendsList(ldbObject)
     end)
 end
 
-local function InitBroker()
+local function initBroker()
     local LDB = LibStub("LibDataBroker-1.1")
     AddonTable.BrokerTinyFriends = LDB:NewDataObject("Broker_TinyFriends", {
         type = "data source",
@@ -510,7 +517,7 @@ local function InitBroker()
 
         OnEnter = function(self)
             if #AddonTable.wowFriends > 0 or #AddonTable.otherFriends > 0 then                
-                ShowFriendsList(self)
+                showFriendsList(self)
             end
         end,
 
@@ -526,14 +533,20 @@ local function updateBrokerText()
     --delayed throttling so we always got the latest data but after short delay to prevent spamming and resource hogging.
     if not AddonTable.friendsListUpdateTimer then
         AddonTable.friendsListUpdateTimer = C_Timer.NewTimer(4, function()
-            local numWowFriends, _ = UpdateFriendsList()
+            local numWowFriends, _ = updateFriendsList()
             AddonTable.BrokerTinyFriends.text = string.format(WrapTextInColorCode("%s:", "FF00FFF6") .. " %d Online", "Friends", numWowFriends)
             AddonTable.friendsListUpdateTimer = nil
         end)
     end
 end
 
-local function InitTinyFriends()
+local function initTinyFriends()
+    --Build a lookup table to so I can get the localization independent class name.
+    classLookup = {}
+    for i = 1, GetNumClasses() do
+        local localizedName, classLocalizationIndependent, _ = GetClassInfo(i)
+        classLookup[localizedName] = classLocalizationIndependent
+    end
     AddonTable.wowFriendsSort = {
         order = "name",
         ascending = true
@@ -548,10 +561,10 @@ local function InitTinyFriends()
     C_FriendList.ShowFriends()
 end
 
-local function OnEvent(self, event, ...)
+local function onEvent(self, event, ...)
     if event == "ADDON_LOADED" and ... == addonName then
-        InitTinyFriends()
-        InitBroker()
+        initTinyFriends()
+        initBroker()
     elseif event == "PLAYER_ENTERING_WORLD" then
         updateBrokerText()
     elseif event == "FRIENDLIST_UPDATE" or
@@ -570,4 +583,4 @@ f:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
 f:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
 f:RegisterEvent("BN_FRIEND_INFO_CHANGED")
 
-f:SetScript("OnEvent", OnEvent)
+f:SetScript("OnEvent", onEvent)
