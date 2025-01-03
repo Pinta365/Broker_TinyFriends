@@ -58,6 +58,8 @@ local function UpdateFriendsList()
 
             if gameInfo.isOnline then
                 if gameInfo.clientProgram == "WoW" then
+                    local _, classLocalizationIndependent = GetPlayerInfoByGUID(gameInfo.playerGuid)
+
                     local friend = {
                         name = name,
                         accountName = accountInfo.accountName,
@@ -70,6 +72,7 @@ local function UpdateFriendsList()
                         clientProgram = gameInfo.clientProgram,
                         characterName = gameInfo.characterName,
                         className = gameInfo.className,
+                        classLocalizationIndependent = classLocalizationIndependent,
                         characterLevel = gameInfo.characterLevel,
                         realmName = gameInfo.realmName,
                         richPresence = gameInfo.richPresence,
@@ -351,7 +354,7 @@ local function ShowFriendsList(ldbObject)
         noteText:SetPoint("LEFT", noteHorizontalPosition, 0)
         friendFrame.noteText = noteText
 
-        local classColor = C_ClassColor.GetClassColor(friend.className)
+        local classColor = C_ClassColor.GetClassColor(friend.classLocalizationIndependent)
         if classColor then
             nameText:SetTextColor(classColor.r, classColor.g, classColor.b)
         end
