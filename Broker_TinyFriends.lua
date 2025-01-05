@@ -264,6 +264,7 @@ local function showFriendsList(ldbObject)
     local totalHeight = wowFriendsHeight + otherFriendsHeight + verticalOffset + verticalIncrement + 60
     local totalWidth = max(panelWidthOther * 2, panelWidthWow)
     friendsFrame = CreateFrame("Frame", nil, UIParent, "TooltipBorderedFrameTemplate")
+    friendsFrame:SetFrameStrata("HIGH")
     friendsFrame:SetSize(totalWidth + headerPadding, totalHeight)
 
     -- WoW Friends Frame
