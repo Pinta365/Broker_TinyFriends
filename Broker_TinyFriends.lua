@@ -47,7 +47,6 @@ local function updateFriendsList()
     for i = 1, numBNetTotal do
         local accountInfo = C_BattleNet.GetFriendAccountInfo(i)
         local gameInfo = accountInfo and accountInfo.gameAccountInfo
-
         if accountInfo and gameInfo then
 
             local battleTag = accountInfo.battleTag
@@ -63,7 +62,8 @@ local function updateFriendsList()
                         name = name,
                         accountName = accountInfo.accountName,
                         note = accountInfo.note,
-
+                        isAFK = accountInfo.isAFK or gameInfo.isGameAFK,
+                        isDND = accountInfo.isDND or gameInfo.isGameBusy,
                         gameAccountID = gameInfo.gameAccountID,
                         playerGuid = gameInfo.playerGuid,
                         wowProjectID = gameInfo.wowProjectID,
@@ -81,6 +81,8 @@ local function updateFriendsList()
                     local friend = {
                         name = name,
                         accountName = accountInfo.accountName,
+                        isAFK = accountInfo.isAFK or gameInfo.isGameAFK,
+                        isDND = accountInfo.isDND or gameInfo.isGameBusy,
                         clientProgram = gameInfo.clientProgram,
                         clientName = clientList[gameInfo.clientProgram] or nil,
                         richPresence = gameInfo.richPresence,
@@ -240,14 +242,14 @@ local function showFriendsList(ldbObject)
     end
 
     local headerPadding = 10
-    local nameHorizontalPosition = 0
+    local nameHorizontalPosition = 10
     local factionHorizontalPosition = nameMaxWidth
     local levelHorizontalPosition = factionHorizontalPosition + 40 + 10
     local clientHorizontalPosition = levelHorizontalPosition + levelMaxWidth + 10
     local presenceHorizontalPosition = clientHorizontalPosition + 30 + 10
     local noteHorizontalPosition = presenceHorizontalPosition + 10 + presenceMaxWidth
 
-    local nameHorizontalPositionOther = 0
+    local nameHorizontalPositionOther = 10
     local clientHorizontalPositionOther = nameMaxWidthOther
     local presenceHorizontalPositionOther = clientHorizontalPositionOther + clientMaxWidthOther + 10
 
@@ -318,6 +320,17 @@ local function showFriendsList(ldbObject)
         local rowWidth = friendsFrame:GetWidth() - (2 * horizontalOffset)
         friendFrame:SetSize(rowWidth, 15)
         friendFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+
+        if friend.isAFK or friend.isBusy then
+            local statusIcon = friendFrame:CreateTexture(nil, "ARTWORK")
+            statusIcon:SetPoint("LEFT", nameHorizontalPosition - 15, 0)
+            statusIcon:SetSize(15, 15)
+            if friend.isAFK then
+                statusIcon:SetTexture(FRIENDS_TEXTURE_AFK)
+            else
+                statusIcon:SetTexture(FRIENDS_TEXTURE_DND)
+            end
+        end
 
         local nameText = friendFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
         nameText:SetPoint("LEFT", nameHorizontalPosition, 0)
@@ -423,8 +436,19 @@ local function showFriendsList(ldbObject)
         friendFrame:SetSize(panelWidthOther, 15)
         friendFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
+        if friend.isAFK or friend.isDND then
+            local statusIcon = friendFrame:CreateTexture(nil, "ARTWORK")
+            statusIcon:SetPoint("LEFT", nameHorizontalPosition - 15, 0)
+            statusIcon:SetSize(15, 15)
+            if friend.isAFK then
+                statusIcon:SetTexture(FRIENDS_TEXTURE_AFK)
+            else
+                statusIcon:SetTexture(FRIENDS_TEXTURE_DND)
+            end
+        end
+
         local nameText = friendFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-        nameText:SetPoint("LEFT", 0, 0)
+        nameText:SetPoint("LEFT", nameHorizontalPosition, 0)
         friendFrame.nameText = nameText
 
         local clientIcon = friendFrame:CreateTexture(nil, "ARTWORK")
