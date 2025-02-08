@@ -368,7 +368,7 @@ local function showFriendsList(ldbObject)
         friendFrame.noteText = noteText
 
         if friend.classLocalizationIndependent then
-            local classColor = C_ClassColor.GetClassColor(friend.classLocalizationIndependent)
+            local classColor = RAID_CLASS_COLORS[friend.classLocalizationIndependent]
             if classColor then
                 nameText:SetTextColor(classColor.r, classColor.g, classColor.b)
             end

@@ -1,6 +1,6 @@
-## Interface: 110007
+## Interface: 40401
 ## Name: Broker_TinyFriends
-## Title: |cff45D388Broker_TinyFriends|r
+## Title: |cff45D388Broker_TinyFriends|r |cfd9b9b9bCataclysm|r
 ## Notes: Broker TinyFriends
 ## Author: Pinta365@Github
 ## Version: 0.0.6
