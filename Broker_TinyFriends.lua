@@ -381,10 +381,16 @@ local function showFriendsList(ldbObject)
             bgTexture:SetAllPoints(friendFrame)
         end
 
+        local friendName = friend.name
+
+        if UnitInParty(friendName) or UnitInRaid(friendName) then
+            friendName = "*" .. friendName
+        end
+
         if #friend.characterName > 0 then
-            nameText:SetText(friend.name .. " (" .. friend.characterName .. ")")
+            nameText:SetText(friendName .. " (" .. friend.characterName .. ")")
         else
-            nameText:SetText(friend.name)
+            nameText:SetText(friendName)
         end
         levelText:SetText(friend.characterLevel)
         presenceText:SetText(friend.richPresence)
