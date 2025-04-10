@@ -39,9 +39,8 @@ local clientList = {
 local function updateFriendsList()
     local wowFriends = {}
     local otherFriends = {}
-
-    -- Regular wow in-game friends will be implemented.
-
+    local addedWowFriendNames = {}
+    
     -- Battle.net Friends
     local numBNetTotal = BNGetNumFriends()
     for i = 1, numBNetTotal do
@@ -75,8 +74,13 @@ local function updateFriendsList()
                         characterLevel = gameInfo.characterLevel,
                         realmName = gameInfo.realmName,
                         richPresence = gameInfo.richPresence,
+                        isBNetFriend = true,
                     }
                     table.insert(wowFriends, friend)
+                    if gameInfo.characterName then
+                        addedWowFriendNames[gameInfo.characterName] = true
+                    end
+
                 else
                     local friend = {
                         name = name,
@@ -86,6 +90,7 @@ local function updateFriendsList()
                         clientProgram = gameInfo.clientProgram,
                         clientName = clientList[gameInfo.clientProgram] or nil,
                         richPresence = gameInfo.richPresence,
+                        isBNetFriend = true,
                     }
                     table.insert(otherFriends, friend)
                 end
@@ -93,6 +98,43 @@ local function updateFriendsList()
         end
     end
 
+    -- Regular wow in-game friends
+    local numRegularFriends = C_FriendList.GetNumFriends()
+    for i = 1, numRegularFriends do
+        local friendInfo = C_FriendList.GetFriendInfoByIndex(i)
+        if friendInfo and friendInfo.connected then
+            local friendName = friendInfo.name
+            local findDash = friendName and string.find(friendName, "-")
+            if findDash then
+                friendName = string.sub(friendName, 1, findDash - 1)
+            end
+
+            --Adding if we don't already have the player on Bnet friend
+            if not addedWowFriendNames[friendName] then
+                local friend = {
+                    name = friendInfo.name,
+                    accountName = nil,
+                    note = friendInfo.notes,
+                    isAFK = friendInfo.afk,
+                    isDND = friendInfo.dnd,
+                    gameAccountID = nil, 
+                    playerGuid = friendInfo.guid,
+                    wowProjectID = nil,
+                    factionName = nil,
+                    clientProgram = "WoW",
+                    characterName = friendName,
+                    className = friendInfo.className,
+                    classLocalizationIndependent = classLookup and classLookup[friendInfo.className] or nil,
+                    characterLevel = friendInfo.level,
+                    realmName = nil,
+                    richPresence = friendInfo.area,
+                    isBNetFriend = false
+                }
+                table.insert(wowFriends, friend)
+            end
+        end
+    end
+  
     if AddonTable.wowFriends then
         wipe(AddonTable.wowFriends)
     end
@@ -387,7 +429,7 @@ local function showFriendsList(ldbObject)
             friendName = "*" .. friendName
         end
 
-        if #friend.characterName > 0 then
+        if #friend.characterName > 0 and friend.isBNetFriend then
             nameText:SetText(friendName .. " (" .. friend.characterName .. ")")
         else
             nameText:SetText(friendName)
@@ -413,7 +455,11 @@ local function showFriendsList(ldbObject)
 
         friendFrame:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
-                ChatFrame_SendBNetTell(friend.accountName)
+                if friend.isBNetFriend then
+                    ChatFrame_SendBNetTell(friend.accountName)
+                else
+                    ChatFrame_SendTell(friend.name)
+                end
             elseif button == "RightButton" then
                 FriendsFrame_InviteOrRequestToJoin(friend.playerGuid, friend.gameAccountID);
             end
