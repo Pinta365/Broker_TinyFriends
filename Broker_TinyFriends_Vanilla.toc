@@ -1,9 +1,9 @@
-## Interface: 11506
+## Interface: 11507
 ## Name: Broker_TinyFriends
 ## Title: |cff45D388Broker_TinyFriends|r |cfd9b9b9bClassic|r
 ## Notes: Broker TinyFriends
 ## Author: Pinta365@Github
-## Version: 0.0.9
+## Version: 0.0.10
 ## SavedVariables: BrokerTinyFriendsDB
 ## X-Curse-Project-ID: 1171007
 ## X-Wago-ID: RNL9Y86o
