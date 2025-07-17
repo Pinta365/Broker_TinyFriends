@@ -1,0 +1,12 @@
+## Interface: 50500
+## Name: Broker_TinyFriends
+## Title: |cff45D388Broker_TinyFriends|r |cfd9b9b9bMists|r
+## Notes: Broker TinyFriends
+## Author: Pinta365@Github
+## Version: 0.0.14
+## SavedVariables: BrokerTinyFriendsDB
+## X-Curse-Project-ID: 1171007
+## X-Wago-ID: RNL9Y86o
+## IconTexture: Interface\AddOns\Broker_TinyFriends\Textures\pinta
+
+embeds.xml
