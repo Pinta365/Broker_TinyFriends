@@ -1,7 +1,7 @@
 ## Interface: 11507
 ## Name: Broker_TinyFriends
-## Title: |cff45D388Broker_TinyFriends|r |cfd9b9b9bClassic|r
-## Notes: Broker TinyFriends
+## Title: |cff45D388TinyFriends|r |cfd9b9b9bClassic|r
+## Notes: View and interact with your Battle.net friends
 ## Author: Pinta365@Github
 ## Version: 1.0.3
 ## SavedVariables: BrokerTinyFriendsDB
