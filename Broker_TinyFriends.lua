@@ -36,6 +36,13 @@ local clientList = {
     BSAp = "Mobile App"
 }
 
+local function addTimerunningIcon(name)
+    if name and name ~= "" then
+        return "|TInterface\\AddOns\\Broker_TinyFriends\\Textures\\timerunning-glues-icon-small.png:9:9|t" .. name
+    end
+    return name
+end
+
 local function updateFriendsList()
     local wowFriends = {}
     local otherFriends = {}
@@ -75,6 +82,7 @@ local function updateFriendsList()
                         realmName = gameInfo.realmName,
                         richPresence = gameInfo.richPresence,
                         isBNetFriend = true,
+                        timerunningSeasonID = gameInfo.timerunningSeasonID,
                     }
                     table.insert(wowFriends, friend)
                     if gameInfo.characterName then
@@ -373,7 +381,7 @@ local function showFriendsList(ldbObject)
                 statusIcon:SetTexture(FRIENDS_TEXTURE_DND)
             end
         end
-
+       
         local nameText = friendFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
         nameText:SetPoint("LEFT", nameHorizontalPosition, 0)
         friendFrame.nameText = nameText
@@ -424,7 +432,9 @@ local function showFriendsList(ldbObject)
         end
 
         local friendName = friend.name
-
+        if friend.timerunningSeasonID then
+            friendName = addTimerunningIcon(friendName)
+        end
         if UnitInParty(friendName) or UnitInRaid(friendName) then
             friendName = "*" .. friendName
         end
