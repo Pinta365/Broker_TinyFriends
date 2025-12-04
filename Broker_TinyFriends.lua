@@ -466,9 +466,9 @@ local function showFriendsList(ldbObject)
         friendFrame:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
                 if friend.isBNetFriend then
-                    ChatFrame_SendBNetTell(friend.accountName)
+                    ChatFrameUtil.SendBNetTell(friend.accountName)
                 else
-                    ChatFrame_SendTell(friend.name)
+                    ChatFrameUtil.SendTell(friend.name)
                 end
             elseif button == "RightButton" then
                 FriendsFrame_InviteOrRequestToJoin(friend.playerGuid, friend.gameAccountID);
@@ -556,7 +556,7 @@ local function showFriendsList(ldbObject)
 
         friendFrame:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
-                ChatFrame_SendBNetTell(friend.accountName)
+                ChatFrameUtil.SendBNetTell(friend.accountName)
             end
         end)
 
