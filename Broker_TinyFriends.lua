@@ -2,6 +2,7 @@ local addonName, AddonTable = ...
 local friendsFrame
 local classLookup
 local tempFontString
+local hideTimer
 
 local nameMaxWidth
 local levelMaxWidth
@@ -35,6 +36,28 @@ local clientList = {
     App = "Desktop App",
     BSAp = "Mobile App"
 }
+
+-- Timer management functions for mouseover system
+local function cancelHideTimer()
+    if hideTimer then
+        hideTimer:Cancel()
+        hideTimer = nil
+    end
+end
+
+local function scheduleHide()
+    cancelHideTimer()
+    hideTimer = C_Timer.NewTimer(0.2, function()
+        if friendsFrame and friendsFrame:IsShown() then
+            local isOverFrame = friendsFrame:IsMouseOver()
+            
+            if not isOverFrame then
+                friendsFrame:Hide()
+            end
+        end
+        hideTimer = nil
+    end)
+end
 
 local function addTimerunningIcon(name)
     if name and name ~= "" then
@@ -574,24 +597,23 @@ local function showFriendsList(ldbObject)
     footerText:SetJustifyH("RIGHT")
     friendsFrame.footerText = footerText
 
+    cancelHideTimer()
     friendsFrame:Show()
     friendsFrame:SetClampedToScreen(true)
 
     anchorFriendsFrame(ldbObject)
 
     friendsFrame:HookScript("OnEnter", function()
+        cancelHideTimer()
         GameTooltip:Show()
     end)
 
     friendsFrame:HookScript("OnLeave", function()
-        if not friendsFrame:IsMouseOver() and not GameTooltip:IsMouseOver() then
-            C_Timer.After(0.1, function()
-                if not friendsFrame:IsMouseOver() and
-                    not GameTooltip:IsMouseOver() then
-                    friendsFrame:Hide()
-                end
-            end)
-        end
+        scheduleHide()
+    end)
+
+    friendsFrame:HookScript("OnHide", function()
+        cancelHideTimer()
     end)
 end
 
@@ -607,15 +629,14 @@ local function initBroker()
         end,
 
         OnEnter = function(self)
+            cancelHideTimer()
             if #AddonTable.wowFriends > 0 or #AddonTable.otherFriends > 0 then                
                 showFriendsList(self)
             end
         end,
 
         OnLeave = function(self)
-            if friendsFrame and not friendsFrame:IsMouseOver() then
-                friendsFrame:Hide()
-            end
+            scheduleHide()
         end,
     })
 end
