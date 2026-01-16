@@ -3,6 +3,15 @@
     <Include file="libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
     <Include file="libs\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
 
+    <!-- Source files -->
+    <Include file="src\config.lua"/>
+    <Include file="src\timer.lua"/>
+    <Include file="src\data.lua"/>
+    <Include file="src\ui.lua"/>
+    <Include file="src\broker.lua"/>
+    <Include file="src\options.lua"/>
+
+    <!-- Main file -->
     <Include file="Broker_TinyFriends.lua"/>
 </Ui>
 
