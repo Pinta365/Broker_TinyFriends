@@ -1,0 +1,12 @@
+## Interface: 20505
+## Name: Broker_TinyFriends
+## Title: |cff45D388TinyFriends|r |cfd9b9b9bTBC|r
+## Notes: View and interact with your Battle.net friends
+## Author: Pinta365@Github
+## Version: 1.1.0
+## SavedVariables: BrokerTinyFriendsDB
+## X-Curse-Project-ID: 1171007
+## X-Wago-ID: RNL9Y86o
+## IconTexture: Interface\AddOns\Broker_TinyFriends\Textures\pinta
+
+embeds.xml
