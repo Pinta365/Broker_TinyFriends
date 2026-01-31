@@ -4,9 +4,8 @@ local addonName, AddonTable = ...
 
 local function initOptionsPanel()
     -- Create the main options panel frame
-    -- Conditionally use parent frame only for Modern Settings API
-    -- Legacy Interface Options doesn't need a parent frame
-    local parent = (Settings and Settings.RegisterCanvasLayoutCategory) and InterfaceOptionsFramePanelContainer or nil
+    -- Legacy Interface Options doesn't need a parent frame.
+    local parent = (Settings and Settings.RegisterCanvasLayoutCategory) and UIParent or nil
     local optionsPanel = CreateFrame("Frame", "BrokerTinyFriendsOptionsPanel", parent)
     optionsPanel.name = "TinyFriends"
     
@@ -76,6 +75,51 @@ local function initOptionsPanel()
     
     optionsPanel.opacitySlider = opacitySlider
     optionsPanel.opacityValueText = valueText
+    yOffset = yOffset - 80
+    
+    -- Panel Scale slider
+    local scaleLabel = optionsPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    scaleLabel:SetPoint("TOPLEFT", 16, yOffset)
+    scaleLabel:SetText("Panel Scale")
+    
+    local scaleSlider = CreateFrame("Slider", nil, optionsPanel, "OptionsSliderTemplate")
+    scaleSlider:SetPoint("TOPLEFT", scaleLabel, "BOTTOMLEFT", 0, -8)
+    scaleSlider:SetWidth(200)
+    scaleSlider:SetMinMaxValues(50, 150)
+    scaleSlider:SetValueStep(5)
+    scaleSlider:SetObeyStepOnDrag(true)
+    
+    local currentScale = (BrokerTinyFriendsDB.scale or 1.0) * 100
+    scaleSlider:SetValue(currentScale)
+    
+    local scaleValueText = scaleSlider:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    scaleValueText:SetPoint("LEFT", scaleSlider, "RIGHT", 10, 0)
+    
+    local scaleLowLabel = scaleSlider:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    scaleLowLabel:SetPoint("TOPLEFT", scaleSlider, "BOTTOMLEFT", 0, -10)
+    scaleLowLabel:SetText("Small")
+    
+    local scaleHighLabel = scaleSlider:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    scaleHighLabel:SetPoint("TOPRIGHT", scaleSlider, "BOTTOMRIGHT", 0, -10)
+    scaleHighLabel:SetText("Large")
+    
+    local function UpdateScaleValue()
+        local value = scaleSlider:GetValue()
+        scaleValueText:SetText(string.format("%d%%", value))
+    end
+    UpdateScaleValue()
+    
+    scaleSlider:SetScript("OnValueChanged", function(self, value)
+        local scale = value / 100
+        BrokerTinyFriendsDB.scale = scale
+        UpdateScaleValue()
+        if BrokerTinyFriends then
+            BrokerTinyFriends:SetScale(UIParent:GetScale() * scale)
+        end
+    end)
+    
+    optionsPanel.scaleSlider = scaleSlider
+    optionsPanel.scaleValueText = scaleValueText
     
     -- Refresh function to update all controls from database
     local function RefreshOptions()
@@ -87,6 +131,13 @@ local function initOptionsPanel()
             optionsPanel.opacitySlider:SetValue(opacity)
             if optionsPanel.opacityValueText then
                 optionsPanel.opacityValueText:SetText(string.format("%d%%", opacity))
+            end
+        end
+        if optionsPanel.scaleSlider then
+            local scale = (BrokerTinyFriendsDB.scale or 1.0) * 100
+            optionsPanel.scaleSlider:SetValue(scale)
+            if optionsPanel.scaleValueText then
+                optionsPanel.scaleValueText:SetText(string.format("%d%%", scale))
             end
         end
     end

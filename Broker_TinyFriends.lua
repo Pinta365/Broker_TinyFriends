@@ -25,7 +25,7 @@ local function initTinyFriends()
     }
     AddonTable.wowFriends = {}
     AddonTable.otherFriends = {}
-    AddonTable.tempFontString = UIParent:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    AddonTable.tempFontString = BrokerTinyFriends:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     C_FriendList.ShowFriends()
 end
 
@@ -35,6 +35,8 @@ local function onEvent(self, event, ...)
         AddonTable.initBroker()
         AddonTable.initOptionsPanel()
     elseif event == "PLAYER_ENTERING_WORLD" then
+        local scaleMult = BrokerTinyFriendsDB and BrokerTinyFriendsDB.scale or 1
+        self:SetScale(UIParent:GetScale() * scaleMult)
         AddonTable.updateBrokerText()
     elseif event == "FRIENDLIST_UPDATE" or
         event == "BN_FRIEND_ACCOUNT_ONLINE" or
