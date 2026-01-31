@@ -79,7 +79,8 @@ local function showFriendsList(ldbObject)
 
     local totalHeight = wowFriendsHeight + otherFriendsHeight + verticalOffset + verticalIncrement + 60
     local totalWidth = max(panelWidthOther * 2, panelWidthWow)
-    AddonTable.friendsFrame = CreateFrame("Frame", nil, UIParent, "TooltipBorderedFrameTemplate")
+
+    AddonTable.friendsFrame = CreateFrame("Frame", nil, BrokerTinyFriends, "TooltipBorderedFrameTemplate")
     AddonTable.friendsFrame:SetFrameStrata("HIGH")
     AddonTable.friendsFrame:SetSize(totalWidth + headerPadding, totalHeight)
     
