@@ -2,6 +2,25 @@
 
 local addonName, AddonTable = ...
 
+local function openWhisper(targetName)
+    if not targetName or targetName == "" then return end
+    if ChatFrameUtil and ChatFrameUtil.SendTell then
+        ChatFrameUtil.SendTell(targetName)
+    else
+        ChatFrame_OpenChat("/w " .. targetName .. " ")
+    end
+end
+
+local function openBNetWhisper(friend)
+    if ChatFrameUtil and ChatFrameUtil.SendBNetTell then
+        ChatFrameUtil.SendBNetTell(friend.accountName)
+    elseif ChatFrame_SendBNetTell then
+        ChatFrame_SendBNetTell(friend.accountName)
+    else
+        openWhisper(friend.characterName or friend.name or friend.accountName or "")
+    end
+end
+
 local function anchorFriendsFrame(ldbObject)
     local isTop = select(2, ldbObject:GetCenter()) > UIParent:GetHeight() / 2
     AddonTable.friendsFrame:ClearAllPoints()
@@ -234,9 +253,9 @@ local function showFriendsList(ldbObject)
         friendFrame:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
                 if friend.isBNetFriend then
-                    ChatFrameUtil.SendBNetTell(friend.accountName)
+                    openBNetWhisper(friend)
                 else
-                    ChatFrameUtil.SendTell(friend.name)
+                    openWhisper(friend.name)
                 end
             elseif button == "RightButton" then
                 FriendsFrame_InviteOrRequestToJoin(friend.playerGuid, friend.gameAccountID);
@@ -324,7 +343,7 @@ local function showFriendsList(ldbObject)
 
         friendFrame:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
-                ChatFrameUtil.SendBNetTell(friend.accountName)
+                openBNetWhisper(friend)
             end
         end)
 
