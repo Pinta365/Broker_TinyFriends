@@ -58,19 +58,40 @@ local function showFriendsList(ldbObject)
         
         showFriendsList(ldbObject)
     end
-    
+
+    AddonTable.sortFriends(AddonTable.wowFriends, "wow")
+    AddonTable.sortFriends(AddonTable.otherFriends, "other")
+
     local function createHeader(parentFrame, horizontalPosition, text, sortType, friendList)
+        local sortData = friendList == "wow" and AddonTable.wowFriendsSort or AddonTable.otherFriendsSort
         local header = CreateFrame("Button", nil, parentFrame)
         local headerText = header:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
         header:SetPoint("TOPLEFT", horizontalPosition, -10)
         header:RegisterForClicks("LeftButtonUp")
         headerText:SetPoint("LEFT", 0, 0)
         headerText:SetText(text)
-        header:SetSize(headerText:GetStringWidth() + 10, 15)
         header.sortType = sortType
         header:SetScript("OnClick", function(self, button)
             sortByHeader(self, button, friendList)
         end)
+
+        local arrow = header:CreateTexture(nil, "ARTWORK")
+        arrow:SetAtlas("auctionhouse-ui-sortarrow")
+        arrow:SetSize(9, 9)
+        arrow:SetPoint("LEFT", headerText, "RIGHT", 3, 0)
+
+        if sortData.order == sortType then
+            arrow:Show()
+            if sortData.ascending then
+                arrow:SetTexCoord(0, 1, 1, 0)
+            else
+                arrow:SetTexCoord(0, 1, 0, 1)
+            end
+        else
+            arrow:Hide()
+        end
+
+        header:SetSize(headerText:GetStringWidth() + 20, 15)
         return header
     end
 
