@@ -30,7 +30,7 @@ end
 local function showFriendsList(ldbObject)
     -- Store LDB object reference for refreshing
     AddonTable.currentLDBObject = ldbObject
-    
+
     if AddonTable.friendsFrame then
         AddonTable.friendsFrame:Hide()
         AddonTable.friendsFrame:SetParent(nil)
@@ -38,7 +38,7 @@ local function showFriendsList(ldbObject)
     end
 
     local function sortByHeader(self, button, friendList)
-        if friendList == "wow" then 
+        if friendList == "wow" then
             if AddonTable.wowFriendsSort.order == self.sortType then
                 AddonTable.wowFriendsSort.ascending = not AddonTable.wowFriendsSort.ascending
             else
@@ -55,7 +55,7 @@ local function showFriendsList(ldbObject)
             end
             AddonTable.sortFriends(AddonTable.otherFriends, "other")
         end
-        
+
         showFriendsList(ldbObject)
     end
 
@@ -111,25 +111,75 @@ local function showFriendsList(ldbObject)
     local verticalIncrement = 15
     local horizontalOffset = 15
 
-    local wowFriendsHeight = #AddonTable.wowFriends * verticalIncrement + 20
-    local otherFriendsHeight = (#AddonTable.otherFriends / 2) * verticalIncrement + 20
+    local wowFriendsHeight = #AddonTable.wowFriends * verticalIncrement + 40
+    local otherFriendsHeight = math.ceil(#AddonTable.otherFriends / 2) * verticalIncrement + 30
 
     local panelWidthWow = noteHorizontalPosition + AddonTable.noteMaxWidth + 30
     local panelWidthOther = (presenceHorizontalPositionOther + AddonTable.presenceMaxWidthOther) + 30
 
-    local totalHeight = wowFriendsHeight + otherFriendsHeight + verticalOffset + verticalIncrement + 60
     local totalWidth = max(panelWidthOther * 2, panelWidthWow)
+
+    local headerAreaHeight = 10
+    local footerHeight = 30
+    local contentHeight = wowFriendsHeight + 10 + otherFriendsHeight
+    local scrollbarWidth = 16
+    local maxScrollArea = (UIParent:GetHeight() * 0.6) - headerAreaHeight - footerHeight
+    local needsScroll = contentHeight > maxScrollArea
+    local scrollAreaHeight = needsScroll and maxScrollArea or contentHeight
+
+    if needsScroll then
+        totalWidth = totalWidth + scrollbarWidth
+    end
+
+    local totalHeight = headerAreaHeight + scrollAreaHeight + footerHeight
 
     AddonTable.friendsFrame = CreateFrame("Frame", nil, BrokerTinyFriends, "TooltipBorderedFrameTemplate")
     AddonTable.friendsFrame:SetFrameStrata("HIGH")
     AddonTable.friendsFrame:SetSize(totalWidth + headerPadding, totalHeight)
-    
+
     local opacity = (BrokerTinyFriendsDB and BrokerTinyFriendsDB.backgroundOpacity) or 0.8
     AddonTable.friendsFrame:SetBackdropColor(0, 0, 0, opacity)
 
+    local scrollFrame = CreateFrame("ScrollFrame", nil, AddonTable.friendsFrame)
+    scrollFrame:SetPoint("TOPLEFT", 0, -headerAreaHeight)
+    scrollFrame:SetPoint("TOPRIGHT", needsScroll and -scrollbarWidth or 0, -headerAreaHeight)
+    scrollFrame:SetHeight(scrollAreaHeight)
+
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetWidth(totalWidth - (needsScroll and scrollbarWidth or 0))
+    scrollChild:SetHeight(contentHeight)
+    scrollFrame:SetScrollChild(scrollChild)
+
+    if needsScroll then
+        local scrollbar = CreateFrame("Slider", nil, AddonTable.friendsFrame)
+        scrollbar:SetPoint("TOPRIGHT", -4, -headerAreaHeight)
+        scrollbar:SetPoint("BOTTOMRIGHT", -4, footerHeight)
+        scrollbar:SetWidth(scrollbarWidth)
+        scrollbar:SetMinMaxValues(0, contentHeight - scrollAreaHeight)
+        scrollbar:SetValueStep(verticalIncrement)
+        scrollbar:SetObeyStepOnDrag(true)
+        scrollbar:SetValue(0)
+
+        local thumbTexture = scrollbar:CreateTexture(nil, "ARTWORK")
+        thumbTexture:SetColorTexture(0.5, 0.5, 0.5, 0.7)
+        thumbTexture:SetSize(scrollbarWidth - 4, 40)
+        scrollbar:SetThumbTexture(thumbTexture)
+
+        scrollbar:SetScript("OnValueChanged", function(self, value)
+            scrollFrame:SetVerticalScroll(value)
+        end)
+
+        scrollFrame:EnableMouseWheel(true)
+        scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+            local current = scrollbar:GetValue()
+            local step = verticalIncrement * 3
+            scrollbar:SetValue(current - (delta * step))
+        end)
+    end
+
     -- WoW Friends Frame
-    local wowFriendsFrame = CreateFrame("Frame", nil, AddonTable.friendsFrame)
-    wowFriendsFrame:SetPoint("TOPLEFT", 0, -(verticalOffset))
+    local wowFriendsFrame = CreateFrame("Frame", nil, scrollChild)
+    wowFriendsFrame:SetPoint("TOPLEFT", 0, 0)
     wowFriendsFrame:SetSize(panelWidthWow + headerPadding, wowFriendsHeight)
 
     -- Headers for WoW friends
@@ -141,21 +191,21 @@ local function showFriendsList(ldbObject)
     createHeader(wowFriendsFrame, noteHorizontalPosition + headerPadding, "Note", "note", "wow")
 
     -- Other Friends Frame
-    local otherFriendsFrame = CreateFrame("Frame", nil, AddonTable.friendsFrame)
-    otherFriendsFrame:SetPoint("TOPLEFT", 0, -((verticalOffset*2)+wowFriendsHeight))
+    local otherFriendsFrame = CreateFrame("Frame", nil, scrollChild)
+    otherFriendsFrame:SetPoint("TOPLEFT", 0, -(wowFriendsHeight + 10))
     otherFriendsFrame:SetSize(panelWidthOther * 2 + headerPadding + 10, otherFriendsHeight)
 
-    -- Headers for Other friends (adjust positions as needed)
+    -- Headers for Other friends
     createHeader(otherFriendsFrame, nameHorizontalPositionOther + headerPadding, "Name", "name", "other")
     createHeader(otherFriendsFrame, clientHorizontalPositionOther + headerPadding, "Client", "client", "other")
-    createHeader(otherFriendsFrame, presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other") 
+    createHeader(otherFriendsFrame, presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other")
 
     -- Add a delimiter between the friend sections
-    local horizontalDelimiter = wowFriendsFrame:CreateTexture(nil, "ARTWORK")
+    local horizontalDelimiter = scrollChild:CreateTexture(nil, "ARTWORK")
     horizontalDelimiter:SetTexture("Interface\\Buttons\\WHITE8X8")
     horizontalDelimiter:SetVertexColor(0.5, 0.5, 0.5, 1)
-    horizontalDelimiter:SetPoint("TOPLEFT", 10, -(verticalOffset+wowFriendsHeight))
-    horizontalDelimiter:SetSize(totalWidth-10, 1)
+    horizontalDelimiter:SetPoint("TOPLEFT", 10, -wowFriendsHeight)
+    horizontalDelimiter:SetSize(totalWidth - 10, 1)
 
     -- Add a delimiter between the other friends columns
     local verticalDelimiter = otherFriendsFrame:CreateTexture(nil, "ARTWORK")
@@ -167,7 +217,7 @@ local function showFriendsList(ldbObject)
     -- Duplicate headers on the right column
     createHeader(otherFriendsFrame, panelWidthOther + 20 + nameHorizontalPositionOther + headerPadding, "Name", "name", "other")
     createHeader(otherFriendsFrame, panelWidthOther + 20 + clientHorizontalPositionOther + headerPadding, "Client", "client", "other")
-    createHeader(otherFriendsFrame, panelWidthOther + 20 + presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other") 
+    createHeader(otherFriendsFrame, panelWidthOther + 20 + presenceHorizontalPositionOther + headerPadding, "Presence", "presence", "other")
 
     -- 1. Online WoW Friends
     local wowVerticalOffset = 25
@@ -175,7 +225,7 @@ local function showFriendsList(ldbObject)
 
         local friendFrame = CreateFrame("Button", nil, wowFriendsFrame)
         friendFrame:SetPoint("TOPLEFT", horizontalOffset, -wowVerticalOffset)
-        local rowWidth = AddonTable.friendsFrame:GetWidth() - (2 * horizontalOffset)
+        local rowWidth = scrollChild:GetWidth() - (2 * horizontalOffset)
         friendFrame:SetSize(rowWidth, 15)
         friendFrame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
@@ -189,7 +239,7 @@ local function showFriendsList(ldbObject)
                 statusIcon:SetTexture(FRIENDS_TEXTURE_DND)
             end
         end
-       
+
         local nameText = friendFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
         nameText:SetPoint("LEFT", nameHorizontalPosition, 0)
         friendFrame.nameText = nameText
@@ -294,10 +344,10 @@ local function showFriendsList(ldbObject)
     local halfOtherFriends = math.ceil(totalOtherFriends / 2)
 
     for i = 1, totalOtherFriends do
-        local friend = AddonTable.otherFriends[i] 
+        local friend = AddonTable.otherFriends[i]
         local friendFrame = CreateFrame("Button", nil, otherFriendsFrame)
 
-        local column1HorizontalPosition = horizontalOffset  
+        local column1HorizontalPosition = horizontalOffset
         local column2HorizontalPosition = horizontalOffset + panelWidthOther + 20
 
         local horizontalPosition = currentColumn == 1 and column1HorizontalPosition or column2HorizontalPosition
@@ -368,7 +418,7 @@ local function showFriendsList(ldbObject)
             end
         end)
 
-        if i == halfOtherFriends then 
+        if i == halfOtherFriends then
             currentColumn = 2
             otherVerticalOffset = 25 -verticalIncrement
         end
@@ -388,21 +438,21 @@ local function showFriendsList(ldbObject)
     local optionsButton = CreateFrame("Button", nil, footer)
     optionsButton:SetPoint("RIGHT")
     optionsButton:SetSize(60, 20)
-    
+
     local optionsText = optionsButton:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     optionsText:SetPoint("CENTER")
     optionsText:SetText("Options")
     optionsText:SetJustifyH("RIGHT")
-    
+
     -- Add mouseover handlers
     optionsButton:SetScript("OnEnter", function()
         AddonTable.cancelHideTimer()
     end)
-    
+
     optionsButton:SetScript("OnLeave", function()
         AddonTable.scheduleHide()
     end)
-    
+
     -- Open Settings panel on click
     -- Works with both Modern Settings API and Legacy Interface Options
     optionsButton:SetScript("OnClick", function(self, button)
@@ -438,4 +488,3 @@ end
 -- Export functions to AddonTable
 AddonTable.anchorFriendsFrame = anchorFriendsFrame
 AddonTable.showFriendsList = showFriendsList
-
