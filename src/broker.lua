@@ -10,7 +10,7 @@ local function initBroker()
         icon = "Interface\\AddOns\\KeystoneRoulette\\Textures\\pinta",
 
         OnClick = function(self, button)
-            ToggleFriendsFrame(1)
+            ToggleFriendsFrame()
         end,
 
         OnEnter = function(self)
