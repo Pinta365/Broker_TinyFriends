@@ -27,7 +27,39 @@ local function initOptionsPanel()
     end)
     optionsPanel.debugCheckbox = debugCheckbox
     yOffset = yOffset - 50
-    
+
+    -- Broker Text Format dropdown
+    local formatLabel = optionsPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    formatLabel:SetPoint("TOPLEFT", 16, yOffset)
+    formatLabel:SetText("Broker Text Format")
+
+    local formatDropdown = CreateFrame("Frame", "BrokerTinyFriendsFormatDropdown", optionsPanel, "UIDropDownMenuTemplate")
+    formatDropdown:SetPoint("TOPLEFT", formatLabel, "BOTTOMLEFT", -16, -4)
+
+    local function FormatDropdown_Initialize(self, level)
+        for i, entry in ipairs(AddonTable.brokerTextFormats) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = entry.label
+            info.value = i
+            info.checked = (BrokerTinyFriendsDB.brokerTextFormat or 1) == i
+            info.func = function()
+                BrokerTinyFriendsDB.brokerTextFormat = i
+                UIDropDownMenu_SetText(formatDropdown, entry.label)
+                local numWowFriends = #AddonTable.wowFriends or 0
+                AddonTable.BrokerTinyFriends.text = entry.format(numWowFriends)
+            end
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end
+
+    UIDropDownMenu_SetWidth(formatDropdown, 180)
+    UIDropDownMenu_Initialize(formatDropdown, FormatDropdown_Initialize)
+    local currentFormat = AddonTable.brokerTextFormats[BrokerTinyFriendsDB.brokerTextFormat or 1]
+    UIDropDownMenu_SetText(formatDropdown, currentFormat and currentFormat.label or "Friends: 5 Online")
+
+    optionsPanel.formatDropdown = formatDropdown
+    yOffset = yOffset - 60
+
     -- Background Opacity slider
     local opacityLabel = optionsPanel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     opacityLabel:SetPoint("TOPLEFT", 16, yOffset)
@@ -125,6 +157,10 @@ local function initOptionsPanel()
     local function RefreshOptions()
         if optionsPanel.debugCheckbox then
             optionsPanel.debugCheckbox:SetChecked(BrokerTinyFriendsDB.debug == true)  -- Default to false
+        end
+        if optionsPanel.formatDropdown then
+            local fmt = AddonTable.brokerTextFormats[BrokerTinyFriendsDB.brokerTextFormat or 1]
+            UIDropDownMenu_SetText(optionsPanel.formatDropdown, fmt and fmt.label or "Friends: 5 Online")
         end
         if optionsPanel.opacitySlider then
             local opacity = (BrokerTinyFriendsDB.backgroundOpacity or 0.8) * 100

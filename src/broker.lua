@@ -31,7 +31,9 @@ local function updateBrokerText()
     if not AddonTable.friendsListUpdateTimer then
         AddonTable.friendsListUpdateTimer = C_Timer.NewTimer(4, function()
             local numWowFriends, _ = AddonTable.updateFriendsList()
-            AddonTable.BrokerTinyFriends.text = string.format(WrapTextInColorCode("%s:", "FF00FFF6") .. " %d Online", "Friends", numWowFriends)
+            local formatIndex = BrokerTinyFriendsDB.brokerTextFormat or 1
+            local formatEntry = AddonTable.brokerTextFormats[formatIndex] or AddonTable.brokerTextFormats[1]
+            AddonTable.BrokerTinyFriends.text = formatEntry.format(numWowFriends)
             AddonTable.friendsListUpdateTimer = nil
         end)
     end

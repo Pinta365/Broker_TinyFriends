@@ -27,11 +27,21 @@ local clientList = {
     BSAp = "Mobile App"
 }
 
+-- Broker text format options
+AddonTable.brokerTextFormats = {
+    { label = "Friends: 15 Online", format = function(n) return string.format(WrapTextInColorCode("%s:", "FF00FFF6") .. " %d Online", "Friends", n) end },
+    { label = "Friends: 15",        format = function(n) return string.format(WrapTextInColorCode("%s:", "FF00FFF6") .. " %d", "Friends", n) end },
+    { label = "F: 15",              format = function(n) return string.format(WrapTextInColorCode("%s:", "FF00FFF6") .. " %d", "F", n) end },
+    { label = "15 Online",          format = function(n) return string.format("%d Online", n) end },
+    { label = "15",                 format = function(n) return tostring(n) end },
+}
+
 -- Default settings
 AddonTable.defaultSettings = {
     debug = false,
     backgroundOpacity = 0.8,  -- Default tooltip transparency (0.0 = transparent, 1.0 = opaque)
-    scale = 1.0               -- Panel scale multiplier (1.0 = match UI scale, 0.5–1.5 = 50%–150%)
+    scale = 1.0,              -- Panel scale multiplier (1.0 = match UI scale, 0.5–1.5 = 50%–150%)
+    brokerTextFormat = 1      -- Index into brokerTextFormats (1 = "Friends: 15 Online")
 }
 
 -- Initialize saved variables
