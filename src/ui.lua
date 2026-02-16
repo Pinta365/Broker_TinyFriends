@@ -45,6 +45,8 @@ local function showFriendsList(ldbObject)
                 AddonTable.wowFriendsSort.order = self.sortType
                 AddonTable.wowFriendsSort.ascending = true
             end
+            BrokerTinyFriendsDB.wowSortOrder = AddonTable.wowFriendsSort.order
+            BrokerTinyFriendsDB.wowSortAscending = AddonTable.wowFriendsSort.ascending
             AddonTable.sortFriends(AddonTable.wowFriends, "wow")
         else -- "other"
             if AddonTable.otherFriendsSort.order == self.sortType then
@@ -53,6 +55,8 @@ local function showFriendsList(ldbObject)
                 AddonTable.otherFriendsSort.order = self.sortType
                 AddonTable.otherFriendsSort.ascending = true
             end
+            BrokerTinyFriendsDB.otherSortOrder = AddonTable.otherFriendsSort.order
+            BrokerTinyFriendsDB.otherSortAscending = AddonTable.otherFriendsSort.ascending
             AddonTable.sortFriends(AddonTable.otherFriends, "other")
         end
 

@@ -41,7 +41,11 @@ AddonTable.defaultSettings = {
     debug = false,
     backgroundOpacity = 0.8,  -- Default tooltip transparency (0.0 = transparent, 1.0 = opaque)
     scale = 1.0,              -- Panel scale multiplier (1.0 = match UI scale, 0.5–1.5 = 50%–150%)
-    brokerTextFormat = 1      -- Index into brokerTextFormats (1 = "Friends: 15 Online")
+    brokerTextFormat = 1,     -- Index into brokerTextFormats (1 = "Friends: 15 Online")
+    wowSortOrder = "name",        -- WoW friends sort column
+    wowSortAscending = true,      -- WoW friends sort direction
+    otherSortOrder = "name",      -- Other friends sort column
+    otherSortAscending = true     -- Other friends sort direction
 }
 
 -- Initialize saved variables

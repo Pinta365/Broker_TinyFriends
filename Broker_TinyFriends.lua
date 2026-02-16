@@ -15,14 +15,17 @@ local function initTinyFriends()
         local localizedName, classLocalizationIndependent, _ = GetClassInfo(i)
         AddonTable.classLookup[localizedName] = classLocalizationIndependent
     end
+    -- Load persisted sort settings
     AddonTable.wowFriendsSort = {
-        order = "name",
-        ascending = true
+        order = BrokerTinyFriendsDB.wowSortOrder or "name",
+        ascending = BrokerTinyFriendsDB.wowSortAscending
     }
+    if AddonTable.wowFriendsSort.ascending == nil then AddonTable.wowFriendsSort.ascending = true end
     AddonTable.otherFriendsSort = {
-        order = "name",
-        ascending = true
+        order = BrokerTinyFriendsDB.otherSortOrder or "name",
+        ascending = BrokerTinyFriendsDB.otherSortAscending
     }
+    if AddonTable.otherFriendsSort.ascending == nil then AddonTable.otherFriendsSort.ascending = true end
     AddonTable.wowFriends = {}
     AddonTable.otherFriends = {}
     AddonTable.tempFontString = BrokerTinyFriends:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
