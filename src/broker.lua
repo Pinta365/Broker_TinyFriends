@@ -7,7 +7,7 @@ local function initBroker()
     AddonTable.BrokerTinyFriends = LDB:NewDataObject("Broker_TinyFriends", {
         type = "data source",
         text = "TinyFriends Loading",
-        icon = "Interface\\AddOns\\KeystoneRoulette\\Textures\\pinta",
+        icon = "Interface\\AddOns\\Broker_TinyFriends\\Textures\\pinta",
 
         OnClick = function(self, button)
             ToggleFriendsFrame()
