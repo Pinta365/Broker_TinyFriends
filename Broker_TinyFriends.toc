@@ -1,4 +1,4 @@
-## Interface: 120105
+## Interface: 120105, 16001, 50504, 20506, 11509
 ## Name: Broker_TinyFriends
 ## Title: |cff45D388TinyFriends|r
 ## Notes: View and interact with your Battle.net friends

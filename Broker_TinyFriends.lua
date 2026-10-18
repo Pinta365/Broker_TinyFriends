@@ -6,14 +6,13 @@ AddonTable.classLookup = {}
 AddonTable.tempFontString = nil
 
 local function initTinyFriends()
-    -- Initialize saved variables
-    AddonTable.initSettings()
-    
     --Build a lookup table to so I can get the localization independent class name.
     AddonTable.classLookup = {}
     for i = 1, GetNumClasses() do
         local localizedName, classLocalizationIndependent, _ = GetClassInfo(i)
-        AddonTable.classLookup[localizedName] = classLocalizationIndependent
+        if localizedName then
+            AddonTable.classLookup[localizedName] = classLocalizationIndependent
+        end
     end
     -- Load persisted sort settings
     AddonTable.wowFriendsSort = {
@@ -34,8 +33,9 @@ end
 
 local function onEvent(self, event, ...)
     if event == "ADDON_LOADED" and ... == addonName then
-        initTinyFriends()
+        AddonTable.initSettings()
         AddonTable.initBroker()
+        initTinyFriends()
         AddonTable.initOptionsPanel()
     elseif event == "PLAYER_ENTERING_WORLD" then
         local scaleMult = BrokerTinyFriendsDB and BrokerTinyFriendsDB.scale or 1
