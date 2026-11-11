@@ -301,7 +301,7 @@ local function showFriendsList(ldbObject)
             friendName = "*" .. friendName
         end
 
-        if #friend.characterName > 0 and friend.isBNetFriend then
+        if friend.characterName and #friend.characterName > 0 and friend.isBNetFriend then
             nameText:SetText(friendName .. " (" .. friend.characterName .. ")")
         else
             nameText:SetText(friendName)

@@ -26,6 +26,8 @@ local function updateFriendsList()
             local name
             if findHashtag then
                 name = string.sub(battleTag, 1, findHashtag - 1)
+            else
+                name = (battleTag ~= "" and battleTag) or accountInfo.accountName or gameInfo.characterName or UNKNOWN
             end
 
             if gameInfo.isOnline then
