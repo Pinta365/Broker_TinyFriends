@@ -7,10 +7,20 @@ AddonTable.tempFontString = nil
 
 local function initTinyFriends()
     --Build a lookup table to so I can get the localization independent class name.
+    -- Note: on Classic clients GetNumClasses() returns the count of available classes (e.g. 9),
+    -- but class IDs are sparse (Druid is 11), so iterating 1..GetNumClasses() misses classes.
     AddonTable.classLookup = {}
-    for i = 1, GetNumClasses() do
-        local localizedName, classLocalizationIndependent, _ = GetClassInfo(i)
-        if localizedName then
+    local function addNames(tbl)
+        if not tbl then return end
+        for classFile, localizedName in pairs(tbl) do
+            AddonTable.classLookup[localizedName] = classFile
+        end
+    end
+    addNames(LOCALIZED_CLASS_NAMES_MALE)
+    addNames(LOCALIZED_CLASS_NAMES_FEMALE)
+    for i = 1, math.max(GetNumClasses() or 0, 20) do
+        local localizedName, classLocalizationIndependent = GetClassInfo(i)
+        if localizedName and classLocalizationIndependent then
             AddonTable.classLookup[localizedName] = classLocalizationIndependent
         end
     end
