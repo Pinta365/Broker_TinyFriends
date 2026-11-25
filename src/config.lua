@@ -39,6 +39,8 @@ AddonTable.brokerTextFormats = {
 -- Default settings
 AddonTable.defaultSettings = {
     debug = false,
+    clickToWhisper = true,    -- Left-click a friend to whisper them
+    clickToInvite = true,     -- Right-click a friend to invite them to a party
     backgroundOpacity = 0.8,  -- Default tooltip transparency (0.0 = transparent, 1.0 = opaque)
     scale = 1.0,              -- Panel scale multiplier (1.0 = match UI scale, 0.5–1.5 = 50%–150%)
     brokerTextFormat = 1,     -- Index into brokerTextFormats (1 = "Friends: 15 Online")

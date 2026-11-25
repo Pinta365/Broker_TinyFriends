@@ -6,7 +6,7 @@
 
 * See your online friends at a glance, with essential information readily available.
 * Sort your friends by name, level, presence, note, client, or faction.
-* Left-click a member to whisper them, or right-click to invite them to a party.
+* Left-click a member to whisper them, or right-click to invite them to a party. Either shortcut can be turned off in the options.
 
 ![Image of the TinyGuild panel](https://cdn.pinta.land/broker/tinyfriends.png)
 

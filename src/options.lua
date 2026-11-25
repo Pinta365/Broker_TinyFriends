@@ -16,6 +16,28 @@ local function initOptionsPanel()
     
     local yOffset = -50
     
+    -- Left-click to whisper checkbox
+    local whisperCheckbox = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
+    whisperCheckbox:SetPoint("TOPLEFT", 16, yOffset)
+    whisperCheckbox.Text:SetText("Left-Click to Whisper")
+    whisperCheckbox.Text:SetFontObject("GameFontHighlightSmall")
+    whisperCheckbox:SetScript("OnClick", function(self)
+        BrokerTinyFriendsDB.clickToWhisper = self:GetChecked()
+    end)
+    optionsPanel.whisperCheckbox = whisperCheckbox
+    yOffset = yOffset - 30
+
+    -- Right-click to invite checkbox
+    local inviteCheckbox = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
+    inviteCheckbox:SetPoint("TOPLEFT", 16, yOffset)
+    inviteCheckbox.Text:SetText("Right-Click to Invite")
+    inviteCheckbox.Text:SetFontObject("GameFontHighlightSmall")
+    inviteCheckbox:SetScript("OnClick", function(self)
+        BrokerTinyFriendsDB.clickToInvite = self:GetChecked()
+    end)
+    optionsPanel.inviteCheckbox = inviteCheckbox
+    yOffset = yOffset - 30
+
     -- Show Debug Messages checkbox
     local debugCheckbox = CreateFrame("CheckButton", nil, optionsPanel, "InterfaceOptionsCheckButtonTemplate")
     debugCheckbox:SetPoint("TOPLEFT", 16, yOffset)
@@ -155,6 +177,12 @@ local function initOptionsPanel()
     
     -- Refresh function to update all controls from database
     local function RefreshOptions()
+        if optionsPanel.whisperCheckbox then
+            optionsPanel.whisperCheckbox:SetChecked(BrokerTinyFriendsDB.clickToWhisper ~= false)  -- Default to true
+        end
+        if optionsPanel.inviteCheckbox then
+            optionsPanel.inviteCheckbox:SetChecked(BrokerTinyFriendsDB.clickToInvite ~= false)  -- Default to true
+        end
         if optionsPanel.debugCheckbox then
             optionsPanel.debugCheckbox:SetChecked(BrokerTinyFriendsDB.debug == true)  -- Default to false
         end

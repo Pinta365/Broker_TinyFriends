@@ -327,12 +327,14 @@ local function showFriendsList(ldbObject)
 
         friendFrame:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
+                if BrokerTinyFriendsDB.clickToWhisper == false then return end
                 if friend.isBNetFriend then
                     openBNetWhisper(friend)
                 else
                     openWhisper(friend.name)
                 end
             elseif button == "RightButton" then
+                if BrokerTinyFriendsDB.clickToInvite == false then return end
                 FriendsFrame_InviteOrRequestToJoin(friend.playerGuid, friend.gameAccountID);
             end
         end)
@@ -417,7 +419,7 @@ local function showFriendsList(ldbObject)
         end)
 
         friendFrame:SetScript("OnClick", function(self, button)
-            if button == "LeftButton" then
+            if button == "LeftButton" and BrokerTinyFriendsDB.clickToWhisper ~= false then
                 openBNetWhisper(friend)
             end
         end)
@@ -437,7 +439,14 @@ local function showFriendsList(ldbObject)
 
     local footerHint = footer:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     footerHint:SetPoint("LEFT")
-    footerHint:SetText("|cFFAAAAAALeft-Click to whisper | Right-Click to invite|r")
+    local hints = {}
+    if BrokerTinyFriendsDB.clickToWhisper ~= false then
+        table.insert(hints, "Left-Click to whisper")
+    end
+    if BrokerTinyFriendsDB.clickToInvite ~= false then
+        table.insert(hints, "Right-Click to invite")
+    end
+    footerHint:SetText(#hints > 0 and ("|cFFAAAAAA" .. table.concat(hints, " | ") .. "|r") or "")
 
     local optionsButton = CreateFrame("Button", nil, footer)
     optionsButton:SetPoint("RIGHT")
